@@ -1,6 +1,6 @@
 #!/usr/bin/node
-import fetch from 'node-fetch'
-import fs from 'fs'
+const https = require('https')
+const fs = require('fs')
 
 //Settings
 const DEBUG = false //Does very little as of now.
@@ -9,7 +9,8 @@ const TRANSCRIPT_PATH = `/tmp/gpt_transcript-${process.ppid}`
 
 //Model parameters
 const MODEL = "text-davinci-003"
-const ENDPOINT = "https://api.openai.com/v1/completions"
+const HOST = "api.openai.com"
+const ENDPOINT = "/v1/completions"
 const MAX_TOKENS = 2048
 const TEMPERATURE = 0.6
 
@@ -45,28 +46,40 @@ const processResponse = (data) => {
   process.exit()
 }
 
+//TODO: Adapt to chat APIs
 const performRequest = () => {
+  const body = JSON.stringify({
+    prompt: input,
+    model: MODEL,
+    max_tokens: MAX_TOKENS,
+    temperature: TEMPERATURE
+  })
+  
   const options = {
+    host: HOST,
+    path: ENDPOINT,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + API_KEY,
-    },
-    body: JSON.stringify({
-      prompt: input,
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      temperature: TEMPERATURE
-    }),
+    }
   }
 
-  //Phoning home. TODO:Check if the other endpoints are supported.
-  fetch(ENDPOINT, options)
-    .then((response) => response.json())
-    .then(processResponse)
-    .catch((e) => {
-      console.error('Fetch request error. Message ahead:\n' + e)
+  const request = https.request(options, (response) => {
+    let data = ""
+    response.on('data', (chunk) => {
+      data += chunk
     })
+
+    response.on('end', () => {
+      processResponse(JSON.parse(data))
+    })
+  })
+  request.write(body)
+  request.on('error', (e) => {
+    console.error('Fetch request error. Message ahead:\n' + e)
+  })
+  request.end()
 }
 
 init()
