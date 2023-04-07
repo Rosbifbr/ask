@@ -1,8 +1,8 @@
 # node-gpt
 
 ## Usage
-Not too much rocket science.
+Not too much rocket science. You can have multiple running sessions.
 
-*nix systems: Add this program to your path and be happy. Call it with 'ask' and pass a string argument.
+*nix systems: Run add_to_path.sh as a superuser and be happy.
 
-Windows: I don't know. Add it to Window's path maybe
+Windows: Add it to Window's path manually
