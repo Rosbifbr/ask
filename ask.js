@@ -7,8 +7,8 @@ const API_KEY = ""
 const TRANSCRIPT_PATH = `/tmp/gpt_transcript-${process.ppid}`
 
 //Model parameters
-const INTERNAL_PROMPT = "This is the transcript of a conversation between assistant, a highly intelligent LLM embedded on a chatbot, and a human user. The LLM responds to all the user's questions truthfully."
-const PRE_PROMPT = "HUMAN: "
+const INTERNAL_PROMPT = ""
+const PRE_PROMPT = ""
 
 const MODEL = "text-davinci-003"
 const HOST = "api.openai.com"
@@ -21,7 +21,6 @@ var answer
 
 const init = () => {
   if (API_KEY == "") throw ("Missing API key! Add one to the script and try again.")
-  if (DEBUG) console.log(`Prompting ${MODEL} with "${input}"`)
   
   if (fs.existsSync(TRANSCRIPT_PATH)){
     input = fs.readFileSync(TRANSCRIPT_PATH, 'utf-8') + input
