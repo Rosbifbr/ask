@@ -3,18 +3,20 @@ const https = require('https')
 const fs = require('fs')
 
 //Settings
-const DEBUG = false //Does very little as of now.
 const API_KEY = ""
 const TRANSCRIPT_PATH = `/tmp/gpt_transcript-${process.ppid}`
 
 //Model parameters
+const INTERNAL_PROMPT = "This is the transcript of a conversation between assistant, a highly intelligent LLM embedded on a chatbot, and a human user. The LLM responds to all the user's questions truthfully."
+const PRE_PROMPT = "HUMAN: "
+
 const MODEL = "text-davinci-003"
 const HOST = "api.openai.com"
 const ENDPOINT = "/v1/completions"
 const MAX_TOKENS = 2048
 const TEMPERATURE = 0.6
 
-var input = process.argv[2]
+var input = PRE_PROMPT + process.argv[2]
 var answer
 
 const init = () => {
@@ -23,6 +25,9 @@ const init = () => {
   
   if (fs.existsSync(TRANSCRIPT_PATH)){
     input = fs.readFileSync(TRANSCRIPT_PATH, 'utf-8') + input
+  }
+  else if (INTERNAL_PROMPT){
+     fs.writeFileSync(TRANSCRIPT_PATH,INTERNAL_PROMPT)
   }
 
   performRequest()
@@ -83,3 +88,4 @@ const performRequest = () => {
 }
 
 init()
+
