@@ -13,6 +13,7 @@ ask "What are the top 5 partition editors in linux?"
 You may customize the application by editing the ask.js file and setting custom values for:
 
 INTERNAL_PROMPT - String that will be prepended to each session on it's start
+
 PRE_PROMPT - String that will be prepended to each user input
 
 These prompts allow for an easier setup and steering of the model into a 'chat mode', such as in:
