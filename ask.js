@@ -12,6 +12,7 @@ const ENDPOINT = "/v1/chat/completions"
 const MAX_TOKENS = 2048
 const TEMPERATURE = 0.6
 
+//Globals
 var input = process.argv[2]
 var conversation_state = {}
 var answer
@@ -27,19 +28,27 @@ const init = () => {
       "messages": [
         {
           'role':'system',
-          'content':'You are GPT-5, a very advanced assistant. You are talking to a power user.'
+          'content':'You are a very advanced assistant AI. You are talking to a power user.'
         }
       ],
     }
   }
 
-  conversation_state['messages'].push({
-    'role': 'user',
-    'content': input,
-  })
-  performRequest()
+  switch(input){
+    case undefined:
+        showHistory()
+        break;
+    default:
+        performRequest()
+        break;
+  }
 }
 
+const showHistory = () => {
+	console.log(JSON.stringify(conversation_state['messages'], null, 2))
+}
+
+//Chat functions.
 const processResponse = (data) => {
   try {
     answer = data.choices[0]
@@ -60,6 +69,12 @@ const processResponse = (data) => {
 }
 
 const performRequest = () => {
+  //Adding our message to state.
+  conversation_state['messages'].push({
+    'role': 'user',
+    'content': input,
+  })
+
   const body = JSON.stringify({
     messages: conversation_state['messages'],
     model: MODEL,
@@ -97,4 +112,3 @@ const performRequest = () => {
 }
 
 init()
-
