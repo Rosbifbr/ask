@@ -28,7 +28,7 @@ const init = () => {
       "messages": [
         {
           'role':'system',
-          'content':'You are a very advanced assistant AI. You are talking to a power user.'
+          'content':'You are a very advanced assistant AI. You are talking to a power user. Be concise and efficient in your answers unless specified otherwise.'
         }
       ],
     }

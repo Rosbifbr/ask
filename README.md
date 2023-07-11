@@ -1,24 +1,18 @@
 ## node-gpt
-Node GPT arose of my need to use LLM-based chatbots in a terminal without wasting the time to open a heavy browser or to switch screens. The application is light, fast and keeps one separate conversation history per terminal.
+NodeGPT arose of my need to use LLM-based chatbots in a terminal without wasting the time to open a heavy browser or to switch screens. The application is lightweight and keeps one separate conversation history per process.
+
+The script uses the newer chat API from OpenAI and is preconfigured to use the GPT-4 model.
 
 ## Installation
-To use it on UNIX-based systems, all you need to do is have a node binary installed and run 'add_to_path.sh'.
+To use it on UNIX-based systems, all you need to do is have NodeJS installed and run 'add_to_path.sh'.
 
-## Usage
-The application is of very simple usage. Call it with the 'ask' command and pass a string argument, such as in:
-```
-ask "What are the top 5 partition editors in linux?"
-```
+## Usage and Examples
+First off, be sure to configure your API key in your script.
 
-You may customize the application by editing the ask.js file and setting custom values for:
+The operating principle is very simple. Call the program, wait for a response and answer at will.
+`ask "Hi there"` - Prompts the model.
 
-INTERNAL_PROMPT - String that will be prepended to each session on it's start
+`ask` - Displays a JSON of the current conversation state.
 
-PRE_PROMPT - String that will be prepended to each user input
+`ask | jq '.[].content'` - Parses the conversation with jq to display only the messages.
 
-These prompts allow for an easier setup and steering of the model into a 'chat mode', such as in:
-
-```
-INTERNAL_PROMPT = "This is a transcript of a converation between BOB, a very intelligent, helpful and ethical LLM and a human user.\nBOB: How may I help you today?\n"
-PRE_PROMPT = "HUMAN:"
-```
