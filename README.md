@@ -14,5 +14,6 @@ The operating principle is very simple. Call the program, wait for a response an
 
 `ask` - Displays a JSON of the current conversation state.
 
-`ask | jq '.[].content'` - Parses the conversation with jq to display only the messages.
+`ask | jq '.[].content'` - Parses the conversation with jq to display only the text of the messages.
 
+`cat some_file.c | ask "What does this code do?"` - Parses file then question passed as argument.
