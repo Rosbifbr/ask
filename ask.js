@@ -28,7 +28,7 @@ const init = () => {
       "messages": [
         {
           'role':'system',
-          'content':'You are a very advanced assistant AI. You are talking to a power user. Be concise and efficient in your answers unless specified otherwise.'
+          'content':'You are a very advanced assistant AI. You are talking to a power user. Be succint in your answers unless otherwise requested.'
         }
       ],
     }
@@ -106,9 +106,17 @@ const performRequest = () => {
 
   request.write(body)
   request.on('error', (e) => {
-    console.error('Fetch request error. Message ahead:\n' + e)
+    console.error('HTTP request error. Message ahead:\n' + e)
   })
   request.end()
 }
 
-init()
+//Get any input from stdin if available. Can explode reading larger files.
+input += '\n' //Extra token shouldn't hurt anybody. Temp solution.
+process.stdin.on('data', d => {input += d})
+process.stdin.on('end', () => {init()})
+
+//If no input piped to stdin, close it and start request
+if (process.stdin.isTTY) {
+    process.stdin.emit('end');
+}
