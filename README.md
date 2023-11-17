@@ -10,6 +10,7 @@ To use it on UNIX-based systems, all you need to do is have NodeJS installed and
 First off, be sure to configure your API key in your script.
 
 The operating principle is very simple. Call the program, wait for a response and answer at will.
+
 `ask "Hi there"` - Prompts the model.
 
 `ask` - Displays a JSON of the current conversation state.
