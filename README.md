@@ -1,7 +1,7 @@
-## node-gpt
-NodeGPT arose of my need to use LLM-based chatbots in a terminal without wasting the time to open a heavy browser or to switch screens. The application is lightweight and keeps one separate conversation history per process.
+## ask
+Ask arose of my need to use LLM-based chatbots in a terminal without wasting the time to open a heavy browser or to switch screens. The application is lightweight and keeps one separate conversation history per process.
 
-The script uses the newer chat API from OpenAI and is preconfigured to use the GPT-4 model.
+The script uses the newer chat API from OpenAI and is preconfigured to use the GPT-4 model (gpt-4). You can switch to "gpt-3" for cheaper tokens and better response time in the script settings.
 
 ## Installation
 To use it on UNIX-based systems, all you need to do is have NodeJS installed and run 'add_to_path.sh'.
