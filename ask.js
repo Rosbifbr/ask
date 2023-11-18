@@ -34,14 +34,8 @@ const init = () => {
     }
   }
 
-  switch(input){
-    case undefined:
-        showHistory()
-        break;
-    default:
-        performRequest()
-        break;
-  }
+  if (input) performRequest()
+  else showHistory()
 }
 
 const showHistory = () => {
@@ -112,7 +106,7 @@ const performRequest = () => {
 }
 
 //Get any input from stdin if available. Can explode reading larger files.
-input += '\n' //Extra token shouldn't hurt anybody. Temp solution.
+if (input) input += '\n' 
 process.stdin.on('data', d => {input += d})
 process.stdin.on('end', () => {init()})
 
