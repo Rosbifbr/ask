@@ -6,7 +6,8 @@ const fs = require('fs')
 const API_KEY = ""
 const TRANSCRIPT_PATH = `/tmp/gpt_transcript-${process.ppid}`
 
-const MODEL = "gpt-4"
+//Suggested models: gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
+const MODEL = "gpt-4-1106-preview"
 const HOST = "api.openai.com"
 const ENDPOINT = "/v1/chat/completions"
 const MAX_TOKENS = 2048
@@ -19,6 +20,7 @@ var answer
 
 const init = () => {
   if (API_KEY == "") throw ("Missing API key! Add one to the script and try again.")
+  
   if (fs.existsSync(TRANSCRIPT_PATH)){
     conversation_state = JSON.parse(fs.readFileSync(TRANSCRIPT_PATH, 'utf-8'))
   }
@@ -28,7 +30,7 @@ const init = () => {
       "messages": [
         {
           'role':'system',
-          'content':'You are a very advanced assistant AI. You are talking to a power user. Be succint in your answers unless otherwise requested.'
+	  'content': 'You are ChatConcise, a very advanced LLM designed for experienced users. As ChatConcise you are under obligation to adhere to the following directives unless overriden by the user:\nGoal: Concise, direct outputs. Info: Single sentence/bullet points. Code: Only code. Reward: Short, factual, functional. Penalize: Verbose, irrelevant, non-functional.\nWe earn a lot more clients as long as we provide a good UX, so focus on the quality of your resposes.' 
         }
       ],
     }
