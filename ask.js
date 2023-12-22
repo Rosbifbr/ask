@@ -14,7 +14,8 @@ const MAX_TOKENS = 2048
 const TEMPERATURE = 0.6
 
 //Globals
-var input = process.argv[2]
+var input = process.argv.slice(2).join(' ')
+
 var conversation_state = {}
 var answer
 
