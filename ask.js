@@ -45,6 +45,7 @@ const init = async () => {
   }
 
   if (testOption('o') && process.argv.length < 4) await selectOngoingConvo()
+  else if (testOption('c') && process.argv.length < 4) await clearCurrentConvo()
   else if (input) performRequest()
   else showHistory()
 }
@@ -135,6 +136,11 @@ const selectOngoingConvo = async () => {
 			process.exit(0)
 		}
 	}
+}
+
+const clearCurrentConvo = () => {
+	fs.unlinkSync(TRANSCRIPT_PATH)
+	process.exit(0)
 }
 
 const performRequest = () => {
