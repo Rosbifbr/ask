@@ -1,10 +1,14 @@
 #!/usr/bin/node
 const https = require('https')
 const fs = require('fs')
+const os = require('os')
 const readline = require('readline')
+const { spawn } = require('child_process');
+
 
 //Settings
 const API_KEY = ""
+const EDITOR = process.env.EDITOR || 'vi'
 const TRANSCRIPT_FOLDER = '/tmp'
 const TRANSCRIPT_NAME= 'gpt_transcript-'
 const TRANSCRIPT_PATH = `${TRANSCRIPT_FOLDER}/${TRANSCRIPT_NAME}${process.ppid}`
@@ -56,7 +60,17 @@ const testOption = (option) => {
 }
 
 const showHistory = () => {
-	console.log(JSON.stringify(conversation_state['messages'], null, 2))
+	const tmp_path = os.tmpdir() + '/ask_hist' 
+	fs.writeFileSync(
+		tmp_path,
+		conversation_state['messages'].map(e => `${e.role}\n\n${e.content}`).join('=======================')
+	)
+
+	const child = spawn(EDITOR, [tmp_path], { stdio: 'inherit' });
+	child.on('exit', () => {
+		fs.unlinkSync(tmp_path)
+		process.exit()
+	});
 }
 
 //Chat functions.
