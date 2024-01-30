@@ -59,11 +59,13 @@ const testOption = (option) => {
         else return null
 }
 
+
+const horizontalLine = (char = '=', length = process.stdout.columns) => char.repeat(length);
 const showHistory = () => {
 	const tmp_path = os.tmpdir() + '/ask_hist' 
 	fs.writeFileSync(
 		tmp_path,
-		conversation_state['messages'].map(e => `${e.role}\n\n${e.content}`).join('=======================')
+		conversation_state['messages'].map(e => `${e.role}\n\n${e.content}`).join(`\n${horizontalLine()}\n`)
 	)
 
 	const child = spawn(EDITOR, [tmp_path], { stdio: 'inherit' });
