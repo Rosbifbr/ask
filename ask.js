@@ -8,7 +8,7 @@ const { spawn } = require('child_process');
 
 //Settings
 const API_KEY = ""
-const EDITOR = process.env.EDITOR || 'vi'
+const EDITOR = process.env.EDITOR || 'more'
 const TRANSCRIPT_FOLDER = '/tmp'
 const TRANSCRIPT_NAME= 'gpt_transcript-'
 const TRANSCRIPT_PATH = `${TRANSCRIPT_FOLDER}/${TRANSCRIPT_NAME}${process.ppid}`
