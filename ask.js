@@ -129,6 +129,7 @@ const manageOngoingConvos = async () => {
 	while (true){
 		//Draw files
 		console.clear()
+		console.log('RETURN - Select | D - Delete | CTRL+C - Quit')
 		for (let e of files) {
 			let file_json = JSON.parse(fs.readFileSync(e.path,'utf8'))
 			if (e.selected) process.stdout.write(WHITE_CYAN) 
@@ -137,6 +138,7 @@ const manageOngoingConvos = async () => {
 		}
 
 		if (files.length == 0){
+			console.clear()
 			console.log('No conversations to manage!')
 			process.exit(0)
 		}

@@ -14,8 +14,14 @@ The operating principle is very simple. Call the program, wait for a response an
 
 `ask "Hi there"` - Prompts the model.
 
-`ask` - Displays a JSON of the current conversation state.
+`ask Unqouted strings work too!` - Prompts the model.
 
-`ask | jq '.[].content'` - Parses the conversation with jq to display only the text of the messages.
+`ask Hey there. Can you help me interpret the contents of this directory? $(ls -la)` - Prompts the model with interpolated shell output (Syntax may vary. Example is in bash).
+
+`ask` - Displays the current conversation state.
+
+`ask -c` - Clears current conversation
+
+`ask -o` - Manages ongoing session. 
 
 `cat some_file.c | ask "What does this code do?"` - Parses file then question passed as argument.
