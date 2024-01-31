@@ -48,7 +48,7 @@ const init = async () => {
     }
   }
 
-  if (testOption('o') && process.argv.length < 4) await selectOngoingConvo()
+  if (testOption('o') && process.argv.length < 4) await manageOngoingConvos()
   else if (testOption('c') && process.argv.length < 4) await clearCurrentConvo()
   else if (input) performRequest()
   else showHistory()
@@ -96,7 +96,7 @@ const processResponse = (data) => {
 }
 
 
-const readArrowKey = async () => {
+const readNextKeyCommand = async () => {
 	process.stdin.setRawMode(true);
 	process.stdin.resume();
 	process.stdin.setEncoding('utf8');
@@ -107,13 +107,14 @@ const readArrowKey = async () => {
 		    // else if (key == '\u001B\u005B\u0043') resolve('right')
 	            else if (key == '\u001B\u005B\u0042') resolve('down'); 
 		    // else if (key == '\u001B\u005B\u0044') resolve('left')
-		    else if (key == '\u000D') resolve('enter') 
-		    else if (key === '\u0003') process.exit()
+		    else if (key == '\u000D') resolve('enter')
+		    else if (key == '\u0003') process.exit()
+		    else resolve(key)
 		})
 	)
 }
 
-const selectOngoingConvo = async () => {
+const manageOngoingConvos = async () => {
 	//Map files to struct
 	let files = fs.readdirSync(TRANSCRIPT_FOLDER)
 		.filter(e => e.includes(TRANSCRIPT_NAME))
@@ -134,9 +135,14 @@ const selectOngoingConvo = async () => {
 			console.log(`${e.path} => `, file_json.messages[1].content.split('\n')[0].substr(0,64)) //Show first message
 			if (e.selected) process.stdout.write(RESET) 
 		}
+
+		if (files.length == 0){
+			console.log('No conversations to manage!')
+			process.exit(0)
+		}
 		
 		//treat new command
-		let cmd = await readArrowKey()
+		let cmd = await readNextKeyCommand()
 		let curr = files.findIndex(e => e.selected)
 		if (cmd == 'up' && files[curr -1]) {
 			files[curr].selected = false
@@ -146,10 +152,16 @@ const selectOngoingConvo = async () => {
 			files[curr].selected = false
 			files[curr + 1].selected = true
 		}
-		else if (cmd == 'enter') {
+		else if (cmd == 'enter') { //Copy hist to curr process
 			let curr_file = fs.readFileSync(files[curr].path, 'utf8')
     			fs.writeFileSync(TRANSCRIPT_PATH, curr_file)
 			process.exit(0)
+		}
+		else if (cmd == 'd') { //Nuke hist file
+			fs.unlinkSync(files[curr].path)
+			files.splice(curr,1)
+			if (files[curr]) files[curr].selected = true
+			else if (files[curr - 1]) files[curr - 1].selected = true
 		}
 	}
 }
