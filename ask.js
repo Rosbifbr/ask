@@ -1,32 +1,37 @@
 #!/usr/bin/node
+
+// Javascript terminal LLM caller 
+// Developed by Rodrigo Ourique
+// MIT license
 const https = require('https')
 const fs = require('fs')
 const os = require('os')
 const readline = require('readline')
-const { spawn } = require('child_process');
-
+const { spawn, execSync } = require('child_process');
 
 //Settings
 const API_KEY = ""
-const EDITOR = process.env.EDITOR || 'more'
+const EDITOR = process.env.EDITOR || 'less'
 const TRANSCRIPT_FOLDER = '/tmp'
 const TRANSCRIPT_NAME= 'gpt_transcript-'
 const TRANSCRIPT_PATH = `${TRANSCRIPT_FOLDER}/${TRANSCRIPT_NAME}${process.ppid}`
+const CLIPBOARD_COMMAND = 'xclip -selection clipboard -t image/png -o' //Only for vision APIs. Must return clipboard buffer. Command written with KDE in mind but should work on other DEs running on top of Xserver 
 
-//Suggested models: gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
-const MODEL = "gpt-4-1106-preview"
+//Model parameters
+const MODEL = "gpt-4-vision-preview" //Suggested models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
 const HOST = "api.openai.com"
 const ENDPOINT = "/v1/chat/completions"
 const MAX_TOKENS = 2048
 const TEMPERATURE = 0.6
+const VISION_DETAIL = 'high' //high,low
 
 //Colors
-const WHITE_CYAN = "\u001b[37;46m";
+//const ACCENT_COLOR = "\u001b[37;46m";
+const ACCENT_COLOR = "\u001b[30m\u001b[42m";
 const RESET = "\u001b[0m";
 
 //Globals
 var input = process.argv.slice(2).join(' ')
-
 var conversation_state = {}
 var answer
 
@@ -48,9 +53,15 @@ const init = async () => {
     }
   }
 
-  if (testOption('o') && process.argv.length < 4) await manageOngoingConvos()
-  else if (testOption('c') && process.argv.length < 4) await clearCurrentConvo()
-  else if (input) performRequest()
+  //Exclusive options (behaviour)
+  if (testOption('o') && process.argv.length < 4) return await manageOngoingConvos()
+  if (testOption('c') && process.argv.length < 4) return await clearCurrentConvo()
+ 
+  //Composable options
+  if (testOption('i')) addImageToPipeline() //ONLY WORKS WITH IMAGE MODELS OBVIOUSLY
+
+  //Perform convo request or fallback to default
+  if (input) performRequest()
   else showHistory()
 }
 
@@ -59,6 +70,26 @@ const testOption = (option) => {
         else return null
 }
 
+const addImageToPipeline = () => {
+	let imageBuffer = execSync(CLIPBOARD_COMMAND)
+	imageBuffer = Buffer.from(imageBuffer).toString('base64')
+	
+	//Last, update input to match current vision API spec
+	const user_text = input
+	input = [
+		{
+			'type':'text',
+			'text': user_text,
+		},
+		{
+			'type':'image_url',
+			'image_url': {
+				'url':'data:image/png;base64,' + imageBuffer,
+				'detail': VISION_DETAIL,
+			}
+		}
+	]
+}
 
 const horizontalLine = (char = '=', length = process.stdout.columns) => char.repeat(length);
 const showHistory = () => {
@@ -132,7 +163,7 @@ const manageOngoingConvos = async () => {
 		console.log('RETURN - Select | D - Delete | CTRL+C - Quit')
 		for (let e of files) {
 			let file_json = JSON.parse(fs.readFileSync(e.path,'utf8'))
-			if (e.selected) process.stdout.write(WHITE_CYAN) 
+			if (e.selected) process.stdout.write(ACCENT_COLOR) 
 			console.log(`${e.path} => `, file_json.messages[1].content.split('\n')[0].substr(0,64)) //Show first message
 			if (e.selected) process.stdout.write(RESET) 
 		}
@@ -185,7 +216,7 @@ const performRequest = () => {
     model: MODEL,
     max_tokens: MAX_TOKENS,
     temperature: TEMPERATURE,
-    user: 'new_user' //dinamyze
+    user: 'super_user' //dinamyze
   })
   
   const options = {
@@ -216,7 +247,7 @@ const performRequest = () => {
   request.end()
 }
 
-//Get any input from stdin if available. Can explode reading larger files. TODO: Optimize
+//Get any input piped from stdin if available. Can explode reading larger files. TODO: Optimize
 if (input) input += '\n' 
 process.stdin.on('data', d => {input += d})
 
