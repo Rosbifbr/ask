@@ -216,14 +216,21 @@ const performRequest = () => {
   request.end()
 }
 
-//Get any input from stdin if available. Can explode reading larger files.
+//Get any input from stdin if available. Can explode reading larger files. TODO: Optimize
 if (input) input += '\n' 
 process.stdin.on('data', d => {input += d})
+
+//For normal calling
+process.stdin.on('pause', async () => {
+	await init()
+})
+
+//For piping situations
 process.stdin.on('end', async () => {
 	await init()
 })
 
-//If no input piped to stdin, close it and start request
+//If no input piped to stdin, pause it and start program
 if (process.stdin.isTTY) {
-    process.stdin.emit('end');
+    process.stdin.emit('pause');
 }
