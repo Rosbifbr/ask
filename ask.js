@@ -11,7 +11,7 @@ const { spawn, execSync } = require('child_process');
 
 //Settings
 const API_KEY = ""
-const EDITOR = process.env.EDITOR || 'less'
+const EDITOR = process.env.EDITOR || 'more'
 const TRANSCRIPT_FOLDER = '/tmp'
 const TRANSCRIPT_NAME= 'gpt_transcript-'
 const TRANSCRIPT_PATH = `${TRANSCRIPT_FOLDER}/${TRANSCRIPT_NAME}${process.ppid}`
@@ -91,12 +91,17 @@ const addImageToPipeline = () => {
 	]
 }
 
-const horizontalLine = (char = '=', length = process.stdout.columns) => char.repeat(length);
+const horizontalLine = (char = '▃', length = process.stdout.columns) => char.repeat(length);
 const showHistory = () => {
 	const tmp_path = os.tmpdir() + '/ask_hist' 
 	fs.writeFileSync(
 		tmp_path,
-		conversation_state['messages'].map(e => `${e.role}\n\n${e.content}`).join(`\n${horizontalLine()}\n`)
+		conversation_state['messages'].map(e =>
+			`\n\n${horizontalLine()}` +
+			`▍${e.role} ▐\n`+
+			`${horizontalLine('▀')}\n` +
+			`${e.content[0].text || e.content}`
+		).join('')
 	)
 
 	const child = spawn(EDITOR, [tmp_path], { stdio: 'inherit' });
@@ -163,8 +168,10 @@ const manageOngoingConvos = async () => {
 		console.log('RETURN - Select | D - Delete | CTRL+C - Quit')
 		for (let e of files) {
 			let file_json = JSON.parse(fs.readFileSync(e.path,'utf8'))
+			let first_message = file_json.messages[1].content[0].text || file_json.messages[1].content //Complies with plaintext and vision api structs
+
 			if (e.selected) process.stdout.write(ACCENT_COLOR) 
-			console.log(`${e.path} => `, file_json.messages[1].content.split('\n')[0].substr(0,64)) //Show first message
+			console.log(`${e.path} => `, first_message.split('\n')[0].substr(0,64)) //Show first message
 			if (e.selected) process.stdout.write(RESET) 
 		}
 
@@ -191,10 +198,12 @@ const manageOngoingConvos = async () => {
 			process.exit(0)
 		}
 		else if (cmd == 'd') { //Nuke hist file
-			fs.unlinkSync(files[curr].path)
-			files.splice(curr,1)
-			if (files[curr]) files[curr].selected = true
-			else if (files[curr - 1]) files[curr - 1].selected = true
+			try {
+				fs.unlinkSync(files[curr].path)
+				files.splice(curr,1)
+				if (files[curr]) files[curr].selected = true
+				else if (files[curr - 1]) files[curr - 1].selected = true
+			} catch(e) {} //For now do nohing on permission error
 		}
 	}
 }
