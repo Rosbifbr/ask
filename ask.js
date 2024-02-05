@@ -115,11 +115,9 @@ const showHistory = () => {
 		).join('')
 	)
 
-	const child = spawn(EDITOR, [tmp_path], { stdio: 'inherit' });
-	child.on('exit', () => {
-		fs.unlinkSync(tmp_path)
-		process.exit()
-	});
+	execSync([EDITOR,tmp_path].join(' '), {stdio: 'inherit'})
+	fs.unlinkSync(tmp_path)
+	process.exit()
 }
 
 //Chat functions.
