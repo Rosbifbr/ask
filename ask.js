@@ -220,7 +220,8 @@ const manageOngoingConvos = async () => {
 }
 
 const clearCurrentConvo = () => {
-	fs.unlinkSync(TRANSCRIPT_PATH)
+	try {fs.unlinkSync(TRANSCRIPT_PATH)}
+	catch (e) {console.log(e.message)}
 	process.exit(0)
 }
 
