@@ -24,4 +24,6 @@ The operating principle is very simple. Call the program, wait for a response an
 
 `ask -o` - Manages ongoing session. 
 
+`ask -i - Passes image on the clipboard to the model (Configure clipboard extraction command. Ask is configured to use xclip by default)`
+
 `cat some_file.c | ask "What does this code do?"` - Parses file then question passed as argument.

@@ -15,7 +15,9 @@ const EDITOR = process.env.EDITOR || 'more'
 const TRANSCRIPT_FOLDER = '/tmp'
 const TRANSCRIPT_NAME = 'gpt_transcript-'
 const TRANSCRIPT_PATH = `${TRANSCRIPT_FOLDER}/${TRANSCRIPT_NAME}${process.ppid}`
-const CLIPBOARD_COMMAND = 'xclip -selection clipboard -t image/png -o' //Only for vision APIs. Must return clipboard buffer. Command written with KDE in mind but should work on other DEs running on top of Xserver 
+
+//Only for vision APIs. Must return clipboard buffer. Command written with KDE in mind but should work on other DEs running on top of Xserver
+const CLIPBOARD_COMMAND = 'xclip -selection clipboard -t image/png -o' //Wayland: 'wl-paste'
 
 //Model parameters
 const MODEL = "gpt-4-vision-preview" //Suggested models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
