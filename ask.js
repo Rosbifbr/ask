@@ -36,7 +36,7 @@ const RESET = "\u001b[0m";
 var input = process.argv.slice(2).join(' ')
 var conversation_state = {}
 var answer
-const HELP_TEXT = "Usage: ask [options] [text]\n\nOptions:\n-i: Push image from clipboard into pipeline\n-o: Manage ongoing conversations\n-c: Clear current conversation\n-h: Show this help\n\n"
+const HELP_TEXT = "Usage: ask [options] [text]\n\nOptions:\n-i: Push image from clipboard into pipeline\n-o: Manage ongoing conversations\n-c: Clear current conversation\n-l: Get last message\n-h: Show this help\n\n"
 
 const init = async () => {
 	if (API_KEY == "") throw ("Missing API key! Add one to the script and try again.")
@@ -61,6 +61,11 @@ const init = async () => {
 	else if (testOption('c') && process.argv.length < 4) { await clearCurrentConvo() }
 	else if (testOption('h') && process.argv.length < 4) {
 		console.log(HELP_TEXT)
+		process.exit()
+	}
+	else if (testOption('l') && process.argv.length < 4) {
+		let last = conversation_state['messages'].length - 1
+		console.log(JSON.stringify(conversation_state['messages'][last].content))
 		process.exit()
 	}
 	//Normal operation mode from here
