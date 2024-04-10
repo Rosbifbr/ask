@@ -20,7 +20,7 @@ const TRANSCRIPT_PATH = `${TRANSCRIPT_FOLDER}/${TRANSCRIPT_NAME}${process.ppid}`
 const CLIPBOARD_COMMAND = 'xclip -selection clipboard -t image/png -o' //Wayland: 'wl-paste'
 
 //Model parameters
-const MODEL = "gpt-4-vision-preview" //Suggested models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
+const MODEL = "gpt-4-turbo" //Suggested models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
 const HOST = "api.openai.com"
 const ENDPOINT = "/v1/chat/completions"
 const MAX_TOKENS = 2048
@@ -50,7 +50,7 @@ const init = async () => {
 			"messages": [
 				{
 					'role': 'system',
-					'content': 'You are ChatConcise, a very advanced LLM designed for experienced users. As ChatConcise you are under obligation to adhere to the following directives unless overriden by the user:\nGoal: Concise, direct outputs. Info: Single sentence/bullet points. Code: Only code. Reward: Short, factual, functional. Penalize: Verbose, irrelevant, non-functional.\nRemember to provide the best responses you can. The success of our company depends on you!'
+					'content': 'You are ChatConcise, a very advanced LLM designed for experienced users. As ChatConcise you oblige to adhere to the following directives UNLESS overriden by the user:\nBe concise, proactive, helpful and efficient. Do not say anything more than what needed, but also, DON\'T BE LAZY. Provide ONLY code when an implementation is needed. DO NOT USE MARKDOWN.'
 				}
 			],
 		}
