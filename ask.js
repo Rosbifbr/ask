@@ -17,10 +17,20 @@ const TRANSCRIPT_NAME = 'gpt_transcript-'
 const TRANSCRIPT_PATH = `${TRANSCRIPT_FOLDER}/${TRANSCRIPT_NAME}${process.ppid}`
 
 //Only for vision APIs. Must return clipboard buffer. Command written with KDE in mind but should work on other DEs running on top of Xserver
-const CLIPBOARD_COMMAND = 'xclip -selection clipboard -t image/png -o' //Wayland: 'wl-paste'
+var CLIPBOARD_COMMAND // Not initialized yet
+const CLIPBOARD_COMMAND_XORG = 'xclip -selection clipboard -t image/png -o'
+const CLIPBOARD_COMMAND_WAYLAND = 'wl-paste'
+const OS_IDENTIFIER = 'ps -A' // Simple effective way to know what's going on. TODO can error in busybox implementation
+
+//Detect OS and clipboard capabilities
+//Configure for MacOS accordingly
+const os_out = execSync(OS_IDENTIFIER).toString()
+if (/Xorg/i.test(os_out)) CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_XORG
+else if (/wayland/i.test(os_out)) CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_WAYLAND
+else throw ("Unsupported OS-DE combination. Only Xorg and Wayland are supported.")
 
 //Model parameters
-const MODEL = "gpt-4-turbo" //Suggested models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
+const MODEL = "gpt-4o" //Suggested models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
 const HOST = "api.openai.com"
 const ENDPOINT = "/v1/chat/completions"
 const MAX_TOKENS = 2048
@@ -28,7 +38,6 @@ const TEMPERATURE = 0.6
 const VISION_DETAIL = 'high' //high,low
 
 //Colors
-//const ACCENT_COLOR = "\u001b[37;46m";
 const ACCENT_COLOR = "\u001b[30m\u001b[42m";
 const RESET = "\u001b[0m";
 
