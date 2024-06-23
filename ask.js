@@ -20,6 +20,7 @@ const TRANSCRIPT_PATH = `${TRANSCRIPT_FOLDER}/${TRANSCRIPT_NAME}${process.ppid}`
 var CLIPBOARD_COMMAND // Not initialized yet
 const CLIPBOARD_COMMAND_XORG = 'xclip -selection clipboard -t image/png -o'
 const CLIPBOARD_COMMAND_WAYLAND = 'wl-paste'
+const CLIPBOARD_COMMAND_UNSUPPORTED = 'UNSUPPORTED'
 const OS_IDENTIFIER = 'ps -A' // Simple effective way to know what's going on. TODO can error in busybox implementation
 
 //Detect OS and clipboard capabilities
@@ -27,7 +28,7 @@ const OS_IDENTIFIER = 'ps -A' // Simple effective way to know what's going on. T
 const os_out = execSync(OS_IDENTIFIER).toString()
 if (/Xorg/i.test(os_out)) CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_XORG
 else if (/wayland/i.test(os_out)) CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_WAYLAND
-else throw ("Unsupported OS-DE combination. Only Xorg and Wayland are supported.")
+else CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_UNSUPPORTED
 
 //Model parameters
 const MODEL = "gpt-4o" //Suggested models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
@@ -93,6 +94,10 @@ const testOption = (option) => {
 }
 
 const addImageToPipeline = () => {
+	if (CLIPBOARD_COMMAND == CLIPBOARD_COMMAND_UNSUPPORTED){
+		throw new Error('Unsupported OS/DE combination. Only Xorg and Wayland are supported.')
+	}
+
 	//Remove program options -i
 	let argv = [...process.argv]
 	argv.splice(0, 3)
