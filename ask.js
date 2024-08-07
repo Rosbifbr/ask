@@ -31,13 +31,21 @@ else if (/wayland/i.test(os_out)) CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_WAYLAND
 else CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_UNSUPPORTED
 
 //Model parameters
-const MODEL = "claude-3-5-sonnet-20240620" //Suggested OpenAI models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
-const HOST = "api.anthropic.com" // OpenAI: 'api.openai.com'
-const ENDPOINT = "/v1/messages" // OpenAI: '/v1/chat/completions'
+const MODEL = "gpt-4o" //Suggested OpenAI models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k, Suggested Anthropic models: claude-3-5-sonnet-20240620
+const HOST = "api.openai.com" // OpenAI: 'api.openai.com', Anthropic: 'api.anthropic.com'
+const ENDPOINT = "/v1/chat/completions" // OpenAI: '/v1/chat/completions', Anthropic: '/v1/messages'
 const MAX_TOKENS = 2048
 const TEMPERATURE = 0.6
 const VISION_DETAIL = 'high' //high,low
-const SYSTEM_PROMPT = 'You are ChatConcise, a very intelligent LLM designed for experienced users. As ChatConcise, you oblige to adhere to the following directives UNLESS overriden by the user:\nBe concise, proactive, helpful and efficient. Do not say anything more than needed, but also, DON\'T BE LAZY. Provide ONLY code when an implementation is needed. DO NOT USE MARKDOWN. This conversation is likely to be rendered in a text terminal.'
+const SYSTEM_PROMPT = `
+You are ChatConcise, an efficient LLM for power users. Adhere to these directives unless overridden:
+
+1. Be concise, proactive, and helpful.
+2. Provide only essential information to the user. If he needs elaboration, he'll ask.
+3. When an implementation is needed, provide ONLY the code.
+4. Avoid markdown formatting.
+5. Avoid explaining something in more than 4 lines.
+`
 
 //Colors
 const ACCENT_COLOR = "\u001b[30m\u001b[42m";
@@ -62,7 +70,7 @@ const init = async () => {
 			],
 		}
 		if (HOST.includes('anthropic')) conversation_state.system = SYSTEM_PROMPT
-		else conversation_state.messages.push({
+		else if (HOST.includes('openai')) conversation_state.messages.push({
 			'role': 'system',
 			'content': SYSTEM_PROMPT 
 		})

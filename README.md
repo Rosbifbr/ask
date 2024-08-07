@@ -1,7 +1,7 @@
 ## ask
 ask is a very lightweight script that allows you to chat with Anthropic and OpenAI chatbots in a terminal without wasting the time to open a heavy browser or to switch screens. The application is lightweight and keeps one separate conversation history per process.
 
-The script uses the newer chat API from OpenAI/Anthropic and is preconfigured to use the Claude Sonnet 3.5 model. You can switch to "gpt-4o" depending on your preference or "gpt-3.5-turbo" for cheaper tokens and better response time in the script settings.
+The script uses the newer chat API from OpenAI/Anthropic and is preconfigured to use the GPT-4o  model. You can switch to "claude-3-5-sonnet-20240620" depending on your preference or "gpt-3.5-turbo" for cheaper tokens and better response time in the script settings.
 
 ![WhatsApp Image 2023-11-17 at 17 42 10](https://github.com/Rosbifbr/ask/assets/69912238/4126a92a-792f-4310-832a-7e4ebf65f31f)
 ## Installation
