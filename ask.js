@@ -31,12 +31,13 @@ else if (/wayland/i.test(os_out)) CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_WAYLAND
 else CLIPBOARD_COMMAND = CLIPBOARD_COMMAND_UNSUPPORTED
 
 //Model parameters
-const MODEL = "gpt-4o" //Suggested models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
-const HOST = "api.openai.com"
-const ENDPOINT = "/v1/chat/completions"
+const MODEL = "claude-3-5-sonnet-20240620" //Suggested OpenAI models: gpt-4-vision-preview, gpt-4-1106-preview, gpt-4, gpt-3.5-turbo-16k
+const HOST = "api.anthropic.com" // OpenAI: 'api.openai.com'
+const ENDPOINT = "/v1/messages" // OpenAI: '/v1/chat/completions'
 const MAX_TOKENS = 2048
 const TEMPERATURE = 0.6
 const VISION_DETAIL = 'high' //high,low
+const SYSTEM_PROMPT = 'You are ChatConcise, a very intelligent LLM designed for experienced users. As ChatConcise, you oblige to adhere to the following directives UNLESS overriden by the user:\nBe concise, proactive, helpful and efficient. Do not say anything more than needed, but also, DON\'T BE LAZY. Provide ONLY code when an implementation is needed. DO NOT USE MARKDOWN. This conversation is likely to be rendered in a text terminal.'
 
 //Colors
 const ACCENT_COLOR = "\u001b[30m\u001b[42m";
@@ -58,12 +59,13 @@ const init = async () => {
 		conversation_state = {
 			'model': MODEL,
 			"messages": [
-				{
-					'role': 'system',
-					'content': 'You are ChatConcise, a very advanced LLM designed for experienced users. As ChatConcise you oblige to adhere to the following directives UNLESS overriden by the user:\nBe concise, proactive, helpful and efficient. Do not say anything more than what needed, but also, DON\'T BE LAZY. Provide ONLY code when an implementation is needed. DO NOT USE MARKDOWN.'
-				}
 			],
 		}
+		if (HOST.includes('anthropic')) conversation_state.system = SYSTEM_PROMPT
+		else conversation_state.messages.push({
+			'role': 'system',
+			'content': SYSTEM_PROMPT 
+		})
 	}
 
 	//Exclusive options and behaviours.
@@ -106,21 +108,30 @@ const addImageToPipeline = () => {
 	let imageBuffer = execSync(CLIPBOARD_COMMAND)
 	imageBuffer = Buffer.from(imageBuffer).toString('base64')
 
-	//Last, update input to match current vision API spec
-	const user_text = input
+	//Input is transformed from text into JS object here.
 	input = [
 		{
 			'type': 'text',
-			'text': user_text,
+			'text': input,
 		},
-		{
-			'type': 'image_url',
-			'image_url': {
-				'url': 'data:image/png;base64,' + imageBuffer,
-				'detail': VISION_DETAIL,
-			}
-		}
 	]
+
+	//More API discrepancies
+	if (HOST.includes('openai')) input.push({
+		'type': 'image_url',
+		'image_url': {
+			'url': 'data:image/png;base64,' + imageBuffer,
+			'detail': VISION_DETAIL,
+		}
+	})
+	else if (HOST.includes('anthropic')) input.push({
+		'type': 'image',
+		'source': {
+			"type": "base64",
+			"media_type": 'image/png',
+			'data': imageBuffer,
+		}
+	})
 }
 
 const horizontalLine = (char = '▃', length = process.stdout.columns) => char.repeat(length);
@@ -144,17 +155,31 @@ const showHistory = () => {
 //Chat functions.
 const processResponse = (data) => {
 	try {
-		answer = data.choices[0]
-		console.log(answer['message']['content'])
+		let a_text, answer
+		if (HOST.includes('openai')){
+			answer = data.choices[0]
+			a_text = answer['message']['content']
+			conversation_state['messages'].push(answer['message'])
+		}
+		else if (HOST.includes('anthropic')){
+			//This API is not very standard.
+			answer = data
+			a_text = answer.content[0].text
+			conversation_state['messages'].push({
+				role:'assistant',
+				content: a_text
+			})
+		}
+		else throw new Error('Unsupported API! ' + HOST)
 
-		conversation_state['messages'].push(answer['message'])
+		console.log(a_text)
 		fs.writeFileSync(TRANSCRIPT_PATH, JSON.stringify(conversation_state))
 	}
 
 	catch (e) {
 		console.error('Error processing API return. Full response ahead:\n' +
 			JSON.stringify(data, null, 2) +
-			"Full error:" + e
+			"\n\nFull error:" + e.stack
 		)
 	}
 
@@ -258,8 +283,10 @@ const performRequest = () => {
 		model: MODEL,
 		max_tokens: MAX_TOKENS,
 		temperature: TEMPERATURE,
-		user: 'super_user' //dinamyze
 	})
+	if (HOST.includes('openai')){
+		body.user = 'super_user'
+	}
 
 	const options = {
 		host: HOST,
@@ -268,6 +295,11 @@ const performRequest = () => {
 		headers: {
 			'Content-Type': 'application/json',
 			'Authorization': 'Bearer ' + API_KEY,
+
+			//Anthropic headers (should be ignored by OpenAI)
+			'x-api-key': API_KEY,
+			'anthropic-version': '2023-06-01' 
+
 		}
 	}
 
