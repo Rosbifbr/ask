@@ -44,7 +44,6 @@ You are ChatConcise, an efficient LLM for power users. Adhere to these directive
 2. Provide only essential information to the user. If he needs elaboration, he'll ask.
 3. When an implementation is needed, provide ONLY the code.
 4. Avoid markdown formatting.
-5. Avoid explaining something in more than 4 lines.
 `
 
 //Colors
@@ -55,7 +54,16 @@ const RESET = "\u001b[0m";
 var input = process.argv.slice(2).join(' ')
 var conversation_state = {}
 var answer
-const HELP_TEXT = "Usage: ask [options] [text]\n\nOptions:\n-i: Push image from clipboard into pipeline\n-o: Manage ongoing conversations\n-c: Clear current conversation\n-l: Get last message\n-h: Show this help\n\n"
+const HELP_TEXT = `Usage: ask [options] [text]
+
+Options:
+-i: Push image from clipboard into pipeline
+-o: Manage ongoing conversations
+-c: Clear current conversation
+-l: Get last message
+-h: Show this help
+
+`;
 
 const init = async () => {
 	if (API_KEY == "") throw ("Missing API key! Add one to the script and try again.")
