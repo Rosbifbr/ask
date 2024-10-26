@@ -1,3 +1,6 @@
+## Deprecation Notice
+As of 2024-10-26, this project is completely replicated in functionality by a faster Rust implementation. As such it will remain open to the public, but no longer be updated. The rust version is available here: https://github.com/Rosbifbr/ask_rs
+
 ## ask
 ask is a very lightweight script that allows you to chat with OpenAI chatbots in a terminal without wasting the time to open a heavy browser or to switch screens. The application is lightweight and keeps one separate conversation history per process.
 
